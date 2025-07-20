@@ -1,0 +1,69 @@
+#
+# Author: Fabio Grasso <fabio.grasso@okta.com>
+# License: Apache-2.0
+# Version: 1.0.0
+# Description: Docker-compose to start a full RADIUS Lab with:
+#              - Okta RADIUS Agent (RADIUS Server)
+#              - radclient (CLI RADIUS Client)
+#              - OpenVPN AS
+#
+# -----------------------------------------------------------------------------
+
+services:
+
+  okta-radius-agent:
+    build: ./docker/okta-radius-agent
+    volumes:
+      - ./data/conf/okta/config:/opt/okta/ragent/user/config/radius
+      - ./data/conf/okta/lib:/var/lib/ragent
+      - ./data/logs/okta:/opt/okta/ragent/logs
+    platform: linux/amd64 # Workaround for compatibility with MacOS
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - "${RADIUS_PORT}:${RADIUS_PORT}/udp"
+    restart: unless-stopped
+    networks:
+      - radius_network
+
+  radclient:
+    build: ./docker/radclient
+    platform: linux/amd64 # Workaround for compatibility with MacOS
+    depends_on:
+      - okta-radius-agent
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    environment:
+      - RADIUS_SERVER=okta-radius-agent
+    restart: unless-stopped
+    networks:
+      - radius_network
+ 
+  openvpn-as:
+    build: ./docker/openvpn-as
+    depends_on:
+      - okta-radius-agent
+    ports:
+      - "943:943"       # Admin Web UI and Client Web UI (HTTPS) 
+      - "443:443"       # OpenVPN TCP port 
+      - "1194:1194/udp" # OpenVPN UDP port 
+    volumes:
+      - ./data/conf/openvpn:/openvpn/etc
+    cap_add:
+      - NET_ADMIN # Grants the container necessary network administration capabilities 
+      - MKNOD # Allows the container to create device nodes 
+    devices:
+      - /dev/net/tun:/dev/net/tun # Provides access to the TUN device for VPN traffic 
+    restart: no
+    env_file:
+      - .env
+    networks:
+      - radius_network
+
+networks:
+  radius_network:
+    driver: bridge

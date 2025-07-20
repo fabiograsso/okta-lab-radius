@@ -1,0 +1,5 @@
+.cache
+*.deb
+.DS_Store
+data
+*.old
