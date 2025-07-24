@@ -4,7 +4,7 @@ This package contains a Docker-compose stack to run the Okta RADIUS Agent + a cl
 
 More detailed instructions are coming...
 
-Before start, copy the Okta RADIUS Agent setup file (OktaRadiusAgentSetup-x.xx.x.deb) in the `radius-agent` folder
+Before start, copy the Okta RADIUS Agent setup file (OktaRadiusAgentSetup-x.xx.x.deb) in the `packages` folder
 
 ## Commands
 

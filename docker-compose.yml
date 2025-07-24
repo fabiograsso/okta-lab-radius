@@ -10,7 +10,6 @@
 # -----------------------------------------------------------------------------
 
 services:
-
   okta-radius-agent:
     build: ./docker/okta-radius-agent
     volumes:
@@ -27,22 +26,6 @@ services:
     restart: unless-stopped
     networks:
       - radius_network
-
-  radclient:
-    build: ./docker/radclient
-    platform: linux/amd64 # Workaround for compatibility with MacOS
-    depends_on:
-      - okta-radius-agent
-    stdin_open: true
-    tty: true
-    env_file:
-      - .env
-    environment:
-      - RADIUS_SERVER=okta-radius-agent
-    restart: unless-stopped
-    networks:
-      - radius_network
- 
   openvpn-as:
     build: ./docker/openvpn-as
     depends_on:

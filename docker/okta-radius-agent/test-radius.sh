@@ -60,7 +60,7 @@ elif [[ -n "${RADIUS_SERVER}" ]]; then    # Option 2: Environment variable provi
   RADIUS_SERVER="${RADIUS_SERVER}"
   echo "Radius Server Address: $RADIUS_SERVER"
 else                                      # Option 3: No argument or env var, ask the user with a default
-  : "${RADIUS_SERVER:=okta-radius-agent}"
+  : "${RADIUS_SERVER:=localhost}"
   read -p "Radius Server Address [$RADIUS_SERVER]: " input
   RADIUS_SERVER=${input:-$RADIUS_SERVER}
 fi
@@ -94,14 +94,14 @@ fi
 # TEST_IP
 if [[ -n "$6" ]]; then                    # Option 1: Argument provided
   TEST_IP="$6"
-  echo "IP Address (NAS-IP-Address): $TEST_IP"
+  echo "IP Address (Calling-Station-ID): $TEST_IP"
 elif [[ -n "${TEST_IP}" ]]; then    # Option 2: Environment variable provided
   TEST_IP="${TEST_IP}"
-  echo "IP Address (NAS-IP-Address): $TEST_IP"
+  echo "IP Address (Calling-Station-ID): $TEST_IP"
 else                                      # Option 3: No argument or env var, ask the user with a default
   TEST_IP=$(curl -s http://checkip.amazonaws.com || echo "127.0.0.1")
-  echo "IP Address (NAS-IP-Address): $TEST_IP"
-#  read -p "IP Address (NAS-IP-Address) [$TEST_IP]: " input
+  echo "IP Address (Calling-Station-ID): $TEST_IP"
+#  read -p "IP Address (Calling-Station-ID) [$TEST_IP]: " input
 #  TEST_IP=${input:-$TEST_IP}
 fi
 
@@ -111,7 +111,7 @@ echo ""
 
 output=$(printf 'User-Name = "%s"
 User-Password = "%s"
-NAS-IP-Address = %s
+Calling-Station-ID = %s
 ' "$TEST_USERNAME" "$TEST_PASSWORD" "$TEST_IP" | \
   radclient -x "$RADIUS_SERVER:$RADIUS_PORT" auth "$RADIUS_SECRET")
 
@@ -149,7 +149,7 @@ while echo "$output" | grep -q "Access-Challenge"; do
   output=$(printf 'User-Name = "%s"
 User-Password = "%s"
 State = "%s"
-NAS-IP-Address = %s
+Calling-Station-ID = %s
 ' "$TEST_USERNAME" "$MFA_RESPONSE" "$STATE" "$TEST_IP" | \
     radclient -x "$RADIUS_SERVER:$RADIUS_PORT" auth "$RADIUS_SECRET")
   echo -e "\n\033[1;36mRaw server response:\033[0m"
