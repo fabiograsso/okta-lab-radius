@@ -39,11 +39,10 @@ echo "[init] OpenVPN is ready. Applying RADIUS configuration..."
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.name" --value "OktaRADIUS" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.per_server_timeout" --value "${RADIUS_TIMEOUT}" ConfigPut
 
-# Commit and restart OpenVPN service
-/usr/local/openvpn_as/scripts/sacli start
-
 echo "[init] RADIUS configuration complete."
 
+# Commit and restart OpenVPN service
+/usr/local/openvpn_as/scripts/sacli start
 
 # if /usr/local/openvpn_as/scripts/sacli --user "$USERNAME" UserPropGet 2>&1 | grep -q 'No such user'; then
 #  echo "User $USERNAME does not exist. Creating..."
