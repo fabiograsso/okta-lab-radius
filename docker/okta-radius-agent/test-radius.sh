@@ -100,9 +100,8 @@ elif [[ -n "${TEST_IP}" ]]; then    # Option 2: Environment variable provided
   echo "IP Address (Calling-Station-ID): $TEST_IP"
 else                                      # Option 3: No argument or env var, ask the user with a default
   TEST_IP=$(curl -s http://checkip.amazonaws.com || echo "127.0.0.1")
-  echo "IP Address (Calling-Station-ID): $TEST_IP"
-#  read -p "IP Address (Calling-Station-ID) [$TEST_IP]: " input
-#  TEST_IP=${input:-$TEST_IP}
+  read -p "IP Address (Calling-Station-ID) [$TEST_IP]: " input
+  TEST_IP=${input:-$TEST_IP}
 fi
 
 echo ""
