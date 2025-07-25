@@ -1,0 +1,33 @@
+services:
+  radlogin:
+    build: ./radlogin
+    platform: linux/amd64 # Workaround for compatibility with MacOS
+    stdin_open: true
+    tty: true
+    ports:
+      - "8020:8020"
+    configs:
+      - source: server
+        target: /usr/local/radius/server
+      - source: common.ini
+        target: /usr/local/iea/common.ini
+    volumes:
+      - type: bind
+        source: ./data/conf/radclient/profile.dat
+        target: /usr/local/radius/profile.dat
+      - type: bind
+        source: ./data/conf/radclient/monitor.dat
+        target: /usr/local/radius/monitor.dat
+      - type: bind
+        source: ./data/conf/radclient/listen.dat
+        target: /usr/local/radius/listen.dat
+      - ./data/logs/radclient:/usr/local/radius/logs
+
+configs:
+  server:
+    content: |
+      okta-radius-agent	${RADIUS_SECRET}	1812	1813	180	2	3799	
+  common.ini:
+    content: |  
+      []
+      WCPassword=${RADLOGIN_ADMIN_PASSWORD}

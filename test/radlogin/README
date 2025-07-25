@@ -1,0 +1,4 @@
+Experiment with radlogin
+A web interface for manage and test RADIUS
+
+Found some issues with the multi-step MFA with Okta. It doesn't recognize some RADIUS Messages.
