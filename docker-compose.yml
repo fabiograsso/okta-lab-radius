@@ -19,8 +19,12 @@ services:
     platform: linux/amd64 # Workaround for compatibility with MacOS
     stdin_open: true
     tty: true
-    env_file:
-      - .env
+    environment:
+      OKTA_ORG: ${OKTA_ORG}
+      RADIUS_SECRET: ${RADIUS_SECRET}
+      RADIUS_PORT: ${RADIUS_PORT}
+      TEST_USERNAME: ${TEST_USERNAME}
+      TEST_PASSWORD: ${TEST_PASSWORD}
     ports:
       - "${RADIUS_PORT}:${RADIUS_PORT}/udp"
     restart: unless-stopped
@@ -42,8 +46,10 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun # Provides access to the TUN device for VPN traffic 
     restart: no
-    env_file:
-      - .env
+    environment:
+      RADIUS_SECRET: ${RADIUS_SECRET}
+      RADIUS_PORT: ${RADIUS_PORT}
+      OPENVPN_PASSWORD: ${OPENVPN_PASSWORD}
     networks:
       - radius_network
 
