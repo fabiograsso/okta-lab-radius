@@ -16,22 +16,22 @@ COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ./test-radius.sh /usr/local/bin/test-radius.sh
 
 RUN \
-    if [ -z "$(find /tmp/package/ -name 'OktaRadiusAgent*.deb' -print -quit)" ]; then \
+    if [ -z "$(find /tmp/package/ -name '*.deb' -print -quit)" ]; then \
         echo "--> Local .deb not found. Downloading from ${DEB_URL}..." && \
-        FILENAME=$(basename "$DEB_URL") && \
+        FILENAME=$(basename "${DEB_URL}") && \
         curl -fSL -o "/tmp/package/${FILENAME}" "${DEB_URL}"; \
     fi && \
-    dpkg --unpack /tmp/package/OktaRadiusAgent*.deb && \
+    dpkg --unpack /tmp/package/*.deb && \
     rm /var/lib/dpkg/info/ragent.postinst -f && \
     dpkg --configure ragent && \
-    rm -rf /tmp/package/ && \
     mkdir /usr/local/share/okta_radius_defaults && \
     cp /opt/okta/ragent/user/config/radius/* /usr/local/share/okta_radius_defaults/ && \
     echo "ragent.mfa.timeout.seconds = 180" >> /usr/local/share/okta_radius_defaults/config.properties && \
     chmod +x /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/test-radius.sh && \
     ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test && \
-    ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test-radius
+    ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test-radius $$ \
+    rm -rf /tmp/package/ && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
     
 ENTRYPOINT ["/usr/bin/tini", "--"]
 

@@ -25,11 +25,11 @@ services:
     environment:
       OKTA_ORG: ${OKTA_ORG}
       RADIUS_SECRET: ${RADIUS_SECRET}
-      RADIUS_PORT: ${RADIUS_PORT}
-      TEST_USERNAME: ${TEST_USERNAME}
-      TEST_PASSWORD: ${TEST_PASSWORD}
+      RADIUS_PORT: ${RADIUS_PORT:-1812}
+      TEST_USERNAME: ${TEST_USERNAME:-}
+      TEST_PASSWORD: ${TEST_PASSWORD:-}
     ports:
-      - "${RADIUS_PORT}:${RADIUS_PORT}/udp"
+      - "${RADIUS_PORT:-1812}:${RADIUS_PORT:-1812}/udp"
     restart: unless-stopped
     networks:
       - radius_network
