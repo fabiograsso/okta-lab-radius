@@ -9,42 +9,32 @@ LABEL org.opencontainers.image.description="Okta RADIUS Agent"
 
 ARG DEB_URL
 
-# Install prereq
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends tini net-tools freeradius-utils curl && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
 
-# Copy the agent installer into the image
 COPY package/ /tmp/package/
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./test-radius.sh /usr/local/bin/test-radius.sh
 
 RUN \
-    # Find the local .deb file, if it was copied
     if [ -z "$(find /tmp/package/ -name 'OktaRadiusAgent*.deb' -print -quit)" ]; then \
         echo "--> Local .deb not found. Downloading from ${DEB_URL}..." && \
         FILENAME=$(basename "$DEB_URL") && \
         curl -fSL -o "/tmp/package/${FILENAME}" "${DEB_URL}"; \
     fi && \
-    # Install the agent - without running the post installation script
     dpkg --unpack /tmp/package/OktaRadiusAgent*.deb && \
     rm /var/lib/dpkg/info/ragent.postinst -f && \
     dpkg --configure ragent && \
-    rm -rf /tmp/package/
-
-RUN mkdir /usr/local/share/okta_radius_defaults && \
+    rm -rf /tmp/package/ && \
+    mkdir /usr/local/share/okta_radius_defaults && \
     cp /opt/okta/ragent/user/config/radius/* /usr/local/share/okta_radius_defaults/ && \
-    echo "ragent.mfa.timeout.seconds = 180" >> /usr/local/share/okta_radius_defaults/config.properties # Increase the timeout to avoid issue during tests
-
-COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY ./test-radius.sh /usr/local/bin/test-radius.sh
-
-# Make executable and define aliases
-RUN chmod +x /usr/local/bin/entrypoint.sh && \
+    echo "ragent.mfa.timeout.seconds = 180" >> /usr/local/share/okta_radius_defaults/config.properties && \
+    chmod +x /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/test-radius.sh && \
     ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test && \
     ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test-radius
     
-# Set tini as entrypoint
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
 EXPOSE 1812
 
-# App command 
 CMD ["/usr/local/bin/entrypoint.sh"]

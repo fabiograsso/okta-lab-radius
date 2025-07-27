@@ -76,7 +76,7 @@ check-prereqs:
 	@# 1. Check deb file
 	@if ! ls ./docker/okta-radius-agent/package/OktaRadiusAgentSetup-*.deb 1>/dev/null 2>&1; then \
 		echo "\033[0;31mERROR: Okta RADIUS Agent installer (.deb) not found!\033[0m"; \
-		echo "Please place the downloaded agent file in the './docker/okta-radius-agent/' directory."; \
+		echo "Please place the downloaded agent file in the './docker/okta-radius-agent/package/' directory."; \
 		exit 1; \
 	fi
 	@echo "  [✔] Okta RADIUS Agent installer found."
