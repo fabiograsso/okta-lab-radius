@@ -7,16 +7,26 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.source="https://github.com/fabiograsso/okta-lab-radius"
 LABEL org.opencontainers.image.description="Okta RADIUS Agent"
 
+ARG DEB_URL
+
 # Install prereq
-RUN apt-get update -qq && apt-get install -y -qq tini net-tools freeradius-utils curl && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends tini net-tools freeradius-utils curl && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
 
 # Copy the agent installer into the image
-COPY OktaRadiusAgent*.deb /tmp/okta_agent.deb
+COPY package/ /tmp/package/
 
-# Install the agent - without running the post installation script
-RUN dpkg --unpack /tmp/okta_agent.deb && \
+RUN \
+    # Find the local .deb file, if it was copied
+    if [ -z "$(find /tmp/package/ -name 'OktaRadiusAgent*.deb' -print -quit)" ]; then \
+        echo "--> Local .deb not found. Downloading from ${DEB_URL}..." && \
+        FILENAME=$(basename "$DEB_URL") && \
+        curl -fSL -o "/tmp/package/${FILENAME}" "${DEB_URL}"; \
+    fi && \
+    # Install the agent - without running the post installation script
+    dpkg --unpack /tmp/package/OktaRadiusAgent*.deb && \
     rm /var/lib/dpkg/info/ragent.postinst -f && \
-    dpkg --configure ragent
+    dpkg --configure ragent && \
+    rm -rf /tmp/package/
 
 RUN mkdir /usr/local/share/okta_radius_defaults && \
     cp /opt/okta/ragent/user/config/radius/* /usr/local/share/okta_radius_defaults/ && \

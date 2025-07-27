@@ -11,7 +11,10 @@
 
 services:
   okta-radius-agent:
-    build: ./docker/okta-radius-agent
+    build: 
+      context: ./docker/okta-radius-agent
+      args:
+        DEB_URL: ${DEB_URL:-}
     volumes:
       - ./data/conf/okta/config:/opt/okta/ragent/user/config/radius
       - ./data/conf/okta/lib:/var/lib/ragent
