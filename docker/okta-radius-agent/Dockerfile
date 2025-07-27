@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM debian:12-slim
 
 LABEL maintainer="Fabio Gasso <fabio.grasso@okta.com>"
 LABEL org.opencontainers.image.authors="Fabio Gasso <fabio.grasso@okta.com>"
@@ -8,10 +8,10 @@ LABEL org.opencontainers.image.source="https://github.com/fabiograsso/okta-lab-r
 LABEL org.opencontainers.image.description="Okta RADIUS Agent"
 
 # Install prereq
-RUN apt-get update && apt-get install -y tini net-tools freeradius-utils curl && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
+RUN apt-get update -qq && apt-get install -y -qq tini net-tools freeradius-utils curl && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
 
 # Copy the agent installer into the image
-COPY ../packages/OktaRadiusAgent*.deb /tmp/okta_agent.deb
+COPY OktaRadiusAgent*.deb /tmp/okta_agent.deb
 
 # Install the agent - without running the post installation script
 RUN dpkg --unpack /tmp/okta_agent.deb && \
@@ -25,10 +25,12 @@ RUN mkdir /usr/local/share/okta_radius_defaults && \
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ./test-radius.sh /usr/local/bin/test-radius.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh $$ \
+# Make executable and define aliases
+RUN chmod +x /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/test-radius.sh && \
-    ln -s /usr/local/bin/test-radius.sh /usr/local/bin/test
-
+    ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test && \
+    ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test-radius
+    
 # Set tini as entrypoint
 ENTRYPOINT ["/usr/bin/tini", "--"]
 

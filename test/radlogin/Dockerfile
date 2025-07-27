@@ -6,8 +6,8 @@ ENV DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC
 ENV TERM=xterm
 
 # Install necessary packages for Radlogin v4 to run
-RUN apt-get update && \
-    apt-get install -y curl python3 python3-pip  && \
+RUN apt-get update -qq && \
+    apt-get install -qq -y curl python3 python3-pip  && \
     rm -rf /var/lib/apt/lists/*
 
 

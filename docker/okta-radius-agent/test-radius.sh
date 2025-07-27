@@ -7,7 +7,7 @@
 #              using radclient CLI, and parsing the response to ask additional input
 #              if requested by the RADIUS server (i.e. choose the MFA factor)
 #
-# Usage: ./test.sh [username] [password] [server] [secret] [port] [ip]
+# Usage: ./test.sh [server] [username] [password] [secret] [port] [ip]
 #        if args are omitted then:
 #        1. Uses .env variables: TEST_USERNAME, TEST_PASSWORD, RADIUS_SERVER, RADIUS_SECRET, RADIUS_PORT
 #        2. Prompt the user
@@ -26,9 +26,22 @@ echo ""
 # 2. If arguments are empty, try environment variables (e.g., $TEST_USERNAME, $TEST_PASSWORD, ...)
 # 3. If still empty, prompt the user
 
-# TEST_USERNAME
+# RADIUS_SERVER
 if [[ -n "$1" ]]; then                    # Option 1: Argument provided
-  TEST_USERNAME="$1"
+  RADIUS_SERVER="$1"
+  echo "Radius Server Address: $RADIUS_SERVER"
+elif [[ -n "${RADIUS_SERVER}" ]]; then    # Option 2: Environment variable provided
+  RADIUS_SERVER="${RADIUS_SERVER}"
+  echo "Radius Server Address: $RADIUS_SERVER"
+else                                      # Option 3: No argument or env var, ask the user with a default
+  : "${RADIUS_SERVER:=localhost}"
+  read -p "Radius Server Address [$RADIUS_SERVER]: " input
+  RADIUS_SERVER=${input:-$RADIUS_SERVER}
+fi
+
+# TEST_USERNAME
+if [[ -n "$2" ]]; then                    # Option 1: Argument provided
+  TEST_USERNAME="$2"
   echo "User-Name: $TEST_USERNAME"
 elif [[ -n "${TEST_USERNAME}" ]]; then    # Option 2: Environment variable provided
   TEST_USERNAME="${TEST_USERNAME}"
@@ -40,8 +53,8 @@ else                                      # Option 3: No argument or env var, as
 fi
 
 # TEST_PASSWORD
-if [[ -n "$2" ]]; then                    # Option 1: Argument provided
-  TEST_PASSWORD="$2"
+if [[ -n "$3" ]]; then                    # Option 1: Argument provided
+  TEST_PASSWORD="$3"
   echo "User-Password: $TEST_PASSWORD"
 elif [[ -n "${TEST_PASSWORD}" ]]; then    # Option 2: Environment variable provided
   TEST_PASSWORD="${TEST_PASSWORD}"
@@ -50,19 +63,6 @@ else                                      # Option 3: No argument or env var, as
   : "${TEST_PASSWORD:=testpassword}"
   read -p "User-Password [$TEST_PASSWORD]: " input
   TEST_PASSWORD=${input:-$TEST_PASSWORD}
-fi
-
-# RADIUS_SERVER
-if [[ -n "$3" ]]; then                    # Option 1: Argument provided
-  RADIUS_SERVER="$3"
-  echo "Radius Server Address: $RADIUS_SERVER"
-elif [[ -n "${RADIUS_SERVER}" ]]; then    # Option 2: Environment variable provided
-  RADIUS_SERVER="${RADIUS_SERVER}"
-  echo "Radius Server Address: $RADIUS_SERVER"
-else                                      # Option 3: No argument or env var, ask the user with a default
-  : "${RADIUS_SERVER:=localhost}"
-  read -p "Radius Server Address [$RADIUS_SERVER]: " input
-  RADIUS_SERVER=${input:-$RADIUS_SERVER}
 fi
 
 # RADIUS_SECRET
@@ -111,6 +111,7 @@ echo ""
 output=$(printf 'User-Name = "%s"
 User-Password = "%s"
 Calling-Station-ID = %s
+Message-Authenticator = 0x00
 ' "$TEST_USERNAME" "$TEST_PASSWORD" "$TEST_IP" | \
   radclient -x "$RADIUS_SERVER:$RADIUS_PORT" auth "$RADIUS_SECRET")
 
@@ -149,6 +150,7 @@ while echo "$output" | grep -q "Access-Challenge"; do
 User-Password = "%s"
 State = "%s"
 Calling-Station-ID = %s
+Message-Authenticator = 0x00
 ' "$TEST_USERNAME" "$MFA_RESPONSE" "$STATE" "$TEST_IP" | \
     radclient -x "$RADIUS_SERVER:$RADIUS_PORT" auth "$RADIUS_SECRET")
   echo -e "\n\033[1;36mRaw server response:\033[0m"

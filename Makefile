@@ -67,16 +67,16 @@ configure:
 
 radius-test:
 	@echo "--> Launching test script..."
-	@docker compose exec okta-radius-agent test-radius $(USERNAME) $(PASSWORD)
+	@docker compose exec okta-radius-agent test-radius localhost $(USERNAME) $(PASSWORD)
 
 test: radius-test
 
 check-prereqs:
 	@echo "--> Checking prerequisites..."
 	@# 1. Check deb file
-	@if ! ls ./packages/OktaRadiusAgentSetup-*.deb 1>/dev/null 2>&1; then \
+	@if ! ls ./docker/okta-radius-agent/OktaRadiusAgentSetup-*.deb 1>/dev/null 2>&1; then \
 		echo "\033[0;31mERROR: Okta RADIUS Agent installer (.deb) not found!\033[0m"; \
-		echo "Please place the downloaded agent file in the './packages/' directory."; \
+		echo "Please place the downloaded agent file in the './docker/okta-radius-agent/' directory."; \
 		exit 1; \
 	fi
 	@echo "  [✔] Okta RADIUS Agent installer found."
