@@ -22,22 +22,15 @@ done
 
 echo "[init] OpenVPN is ready. Applying RADIUS configuration..."
 
-# Set default parameters
-"${RADIUS_SERVER:=okta-radius-agent}"
-"${RADIUS_PORT:=1812}"
-"${RADIUS_SECRET:=test123}"
-"${RADIUS_TIMEOUT:=180}"
-"${OPENVPN_PASSWORD:=admin}"
-
-/usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "${OPENVPN_PASSWORD}" SetLocalPassword 
+/usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "${OPENVPN_PASSWORD:=admin}" SetLocalPassword 
 /usr/local/openvpn_as/scripts/sacli --key "auth.module.type" --value "radius" ConfigPut
-/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.host" --value "${RADIUS_SERVER}" ConfigPut
-/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.secret" --value "${RADIUS_SECRET}" ConfigPut
-/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.auth_port" --value "${RADIUS_PORT}" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.host" --value "${RADIUS_SERVER:=okta-radius-agent}" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.secret" --value "${RADIUS_SECRET:=test123}" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.auth_port" --value "${RADIUS_PORT:=1812}" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.auth_method" --value "pap" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.enable" --value "True" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.name" --value "OktaRADIUS" ConfigPut
-/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.per_server_timeout" --value "${RADIUS_TIMEOUT}" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.per_server_timeout" --value "${RADIUS_TIMEOUT:=180}" ConfigPut
 
 echo "[init] RADIUS configuration complete."
 

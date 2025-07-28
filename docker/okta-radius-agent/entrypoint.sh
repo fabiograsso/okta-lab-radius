@@ -19,13 +19,13 @@ DEFCONFDIR="/usr/local/share/okta_radius_defaults/"
 
 # If config files don't exist, copy them
 if [ ! -f "$CONFIG" ]; then
-  echo "Missing config.properties. Copying from /tmp..."
+  echo "Missing config.properties. Copying..."
   cp "$DEFCONFDIR/config.properties" "$CONFIG"
   chown OktaRadiusService:OktaRadiusService "$CONFIG"
 fi
 
 if [ ! -f "$LOG4J" ]; then
-  echo "Missing log4j2.xml. Copying from /tmp..."
+  echo "Missing log4j2.xml. Copying..."
   cp "$DEFCONFDIR/log4j2.xml" "$LOG4J"
   chown OktaRadiusService:OktaRadiusService "$LOG4J"
 fi
