@@ -16,13 +16,13 @@ echo "[init] Waiting for OpenVPN Access Server to be ready..."
 
 # Wait for sacli to respond (indicating that sockets are ready)
 until /usr/local/openvpn_as/scripts/sacli Status 2>/dev/null; do
-  echo "[init] Waiting for OpenVPN Access Server to be ready..."
-  sleep 1
+	echo "[init] Waiting for OpenVPN Access Server to be ready..."
+	sleep 1
 done
 
 echo "[init] OpenVPN is ready. Applying RADIUS configuration..."
 
-/usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "${OPENVPN_PASSWORD:=admin}" SetLocalPassword 
+/usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "${OPENVPN_PASSWORD:=admin}" SetLocalPassword
 /usr/local/openvpn_as/scripts/sacli --key "auth.module.type" --value "radius" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.host" --value "${RADIUS_SERVER:=okta-radius-agent}" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "auth.radius.0.server.0.secret" --value "${RADIUS_SECRET:=test123}" ConfigPut

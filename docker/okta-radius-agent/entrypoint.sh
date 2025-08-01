@@ -19,15 +19,15 @@ DEFCONFDIR="/usr/local/share/okta_radius_defaults/"
 
 # If config files don't exist, copy them
 if [ ! -f "$CONFIG" ]; then
-  echo "Missing config.properties. Copying..."
-  cp "$DEFCONFDIR/config.properties" "$CONFIG"
-  chown OktaRadiusService:OktaRadiusService "$CONFIG"
+	echo "Missing config.properties. Copying..."
+	cp "$DEFCONFDIR/config.properties" "$CONFIG"
+	chown OktaRadiusService:OktaRadiusService "$CONFIG"
 fi
 
 if [ ! -f "$LOG4J" ]; then
-  echo "Missing log4j2.xml. Copying..."
-  cp "$DEFCONFDIR/log4j2.xml" "$LOG4J"
-  chown OktaRadiusService:OktaRadiusService "$LOG4J"
+	echo "Missing log4j2.xml. Copying..."
+	cp "$DEFCONFDIR/log4j2.xml" "$LOG4J"
+	chown OktaRadiusService:OktaRadiusService "$LOG4J"
 fi
 
 # Trap termination signals to properly stop Java when container stops
@@ -39,13 +39,12 @@ JAVA_PID=$!
 
 # Wait for the log file to appear before tailing
 while [ ! -f "$LOGFILE" ]; do
-  echo "Waiting for log file to appear at $LOGFILE..."
-  sleep 1
+	echo "Waiting for log file to appear at $LOGFILE..."
+	sleep 1
 done
 
 # Tail the log file to keep the container alive and show output
 tail --retry --follow "$LOGFILE" &
-TAIL_PID=$!
 
 # Wait for the Java process to exit
 wait $JAVA_PID
