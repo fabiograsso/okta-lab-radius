@@ -29,7 +29,6 @@ RUN \
     echo "ragent.mfa.timeout.seconds = 180" >> /usr/local/share/okta_radius_defaults/config.properties && \
     chmod +x /usr/local/bin/entrypoint.sh && \
     chmod +x /usr/local/bin/test-radius.sh && \
-    ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test && \
     ln -sf /usr/local/bin/test-radius.sh /usr/local/bin/test-radius $$ \
     rm -rf /tmp/package/ && rm -rf /var/lib/apt/lists/* && rm -rf /var/log/apt && rm -rf /var/log/dpkg.log
     
