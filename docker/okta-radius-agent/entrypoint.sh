@@ -16,6 +16,7 @@ CONFIG="/opt/okta/ragent/user/config/radius/config.properties"
 LOGFILE="/opt/okta/ragent/logs/okta_radius.log"
 LOG4J="/opt/okta/ragent/user/config/radius/log4j2.xml"
 DEFCONFDIR="/usr/local/share/okta_radius_defaults/"
+CONFIG_ADDITIONAL="/var/lib/ragent/additional-config.properties"
 
 # If config files don't exist, copy them
 if [ ! -f "$CONFIG" ]; then
@@ -28,6 +29,12 @@ if [ ! -f "$LOG4J" ]; then
 	echo "Missing log4j2.xml. Copying..."
 	cp "$DEFCONFDIR/log4j2.xml" "$LOG4J"
 	chown OktaRadiusService:OktaRadiusService "$LOG4J"
+fi
+
+if [ ! -f "$CONFIG_ADDITIONAL" ]; then
+	echo "Missing additional-config.properties. Creating..."
+	touch $CONFIG_ADDITIONAL
+	chown OktaRadiusService:OktaRadiusService "$CONFIG_ADDITIONAL"
 fi
 
 # Trap termination signals to properly stop Java when container stops

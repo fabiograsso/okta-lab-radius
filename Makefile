@@ -2,7 +2,7 @@
 -include .env
 export
 
-.PHONY: help start start-logs stop stop-logs restart restart-logs logs build configure radius-test test check-prereqs
+.PHONY: help start start-logs stop stop-logs restart restart-logs start-live logs build configure radius-test test check-prereqs
 
 help:
 	@echo "Usage: make [target]"
@@ -27,7 +27,7 @@ start: check-prereqs
 	@echo "--> Starting containers in detached mode..."
 	@docker compose up -d
 
-star-live: check-prereqs
+start-live: check-prereqs
 	@echo "--> Starting containers in detached mode..."
 	@docker compose up
 
@@ -63,6 +63,7 @@ kill:
 
 configure:
 	@echo "--> Launching Okta agent configuration script..."
+	@docker compose up -d okta-radius-agent
 	@docker compose exec okta-radius-agent /bin/bash -c "source /opt/okta/ragent/scripts/configure.sh"
 
 radius-test:
@@ -73,13 +74,13 @@ test: radius-test
 
 check-prereqs:
 	@echo "--> Checking prerequisites..."
-	@# 1. Check deb file
-	@if ! ls ./docker/okta-radius-agent/package/OktaRadiusAgentSetup-*.deb 1>/dev/null 2>&1; then \
-		echo "\033[0;31mERROR: Okta RADIUS Agent installer (.deb) not found!\033[0m"; \
-		echo "Please place the downloaded agent file in the './docker/okta-radius-agent/package/' directory."; \
+	@# 1. Check deb file OR DEB_URL
+	@if ! ls ./docker/okta-radius-agent/package/OktaRadiusAgentSetup-*.deb 1>/dev/null 2>&1 && [ -z "$$DEB_URL" ]; then \
+		echo "\033[0;31mERROR: Okta RADIUS Agent installer (.deb) not found and DEB_URL is not set!\033[0m"; \
+		echo "Please place the downloaded agent file in the './docker/okta-radius-agent/package/' directory or set the DEB_URL environment variable."; \
 		exit 1; \
 	fi
-	@echo "  [✔] Okta RADIUS Agent installer found."
+	@echo "  [✔] Okta RADIUS Agent installer found or DEB_URL is set."
 	@# 2. Check that specific required variables are not empty
 	@for var in OKTA_ORG RADIUS_SECRET OPENVPN_PASSWORD; do \
 		if [ -z "$${!var}" ]; then \
