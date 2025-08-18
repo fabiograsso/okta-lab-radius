@@ -68,9 +68,13 @@ configure:
 
 radius-test:
 	@echo "--> Launching test script..."
-	@docker compose exec okta-radius-agent test-radius localhost $(USERNAME) $(PASSWORD)
+	@docker compose exec okta-radius-agent test-radius.sh localhost $(USERNAME) $(PASSWORD)
 
 test: radius-test
+
+configuration: configure
+
+config: configure
 
 check-prereqs:
 	@echo "--> Checking prerequisites..."
