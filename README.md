@@ -8,6 +8,8 @@ More detailed instructions are coming...
 Before start, copy the Okta RADIUS Agent setup file
 (OktaRadiusAgentSetup-x.xx.x.deb) in the `packages` folder
 
+Full instructions here: [https://iam.fabiograsso.net/posts/howto/okta-radius-docker-compose/](https://iam.fabiograsso.net/posts/howto/okta-radius-docker-compose/)
+
 ## Commands
 
 ```bash
