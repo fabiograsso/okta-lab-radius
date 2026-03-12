@@ -33,6 +33,7 @@ services:
     restart: unless-stopped
     networks:
       - radius_network
+      
   openvpn-as:
     build: ./docker/openvpn-as
     depends_on:
@@ -48,7 +49,7 @@ services:
       - MKNOD # Allows the container to create device nodes 
     devices:
       - /dev/net/tun:/dev/net/tun # Provides access to the TUN device for VPN traffic 
-    restart: no
+    restart: unless-stopped
     environment:
       RADIUS_SECRET: ${RADIUS_SECRET}
       RADIUS_PORT: ${RADIUS_PORT:-1812}
